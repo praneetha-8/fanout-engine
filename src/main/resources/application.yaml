@@ -1,0 +1,8 @@
+file:
+  path: sample-data/input.csv
+
+rateLimits:
+  rest: 50
+  grpc: 200
+  mq: 500
+  db: 1000
