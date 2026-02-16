@@ -38,19 +38,31 @@ The application will:
 
 The data flow in the system is as follows:
 
-File Reader (Streaming, BufferedReader)
-        
-        ↓
-BlockingQueue<Record>  (Backpressure)
-        
-        ↓
-Fan-Out Orchestrator (ExecutorService)
-   
-   ↓        ↓        ↓        ↓
-REST Sink  gRPC Sink  MQ Sink  Wide-Column DB Sink
-   
-   ↓        ↓        ↓        ↓
-JSON     Protobuf     XML      Map / CQL-style Data
+                           ┌──────────────────────────┐
+                           │   Input File (CSV/JSON)  │
+                           └─────────────┬────────────┘
+                                         │
+                          Streaming Read │ (BufferedReader)
+                                         │
+                           ┌─────────────▼────────────┐
+                           │   Ingestion Layer         │
+                           │  (Producer Thread)        │
+                           └─────────────┬────────────┘
+                                         │
+                         Backpressure via│
+                      Bounded BlockingQueue<Record>
+                                         │
+                           ┌─────────────▼────────────┐
+                           │   Fan-Out Orchestrator    │
+                           │  (ExecutorService Pool)   │
+                           └───────┬───────┬───────┬──┘
+                                   │       │       │
+                                   │       │       │
+                    ┌──────────────▼┐ ┌────▼─────┐ ┌────▼────────┐ ┌────▼──────────┐
+                    │ REST API Sink  │ │ gRPC Sink│ │ MQ Sink     │ │ Wide-Column DB │
+                    │ JSON Transform │ │ Protobuf │ │ XML         │ │ Map / CQL Map  │
+                    └────────────────┘ └──────────┘ └────────────┘ └───────────────┘
+
 
 Each sink has:
 - Its own transformer
