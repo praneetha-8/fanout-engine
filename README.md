@@ -45,23 +45,22 @@ The data flow in the system is as follows:
                           Streaming Read │ (BufferedReader)
                                          │
                            ┌─────────────▼────────────┐
-                           │   Ingestion Layer         │
-                           │  (Producer Thread)        │
+                           │   Ingestion Layer        │
+                           │  (Producer Thread)       │
                            └─────────────┬────────────┘
                                          │
-                         Backpressure via│
-                      Bounded BlockingQueue<Record>
+                         Backpressure via│Bounded BlockingQueue<Record>
                                          │
                            ┌─────────────▼────────────┐
-                           │   Fan-Out Orchestrator    │
-                           │  (ExecutorService Pool)   │
-                           └───────┬───────┬───────┬──┘
-                                   │       │       │
-                                   │       │       │
-                    ┌──────────────▼┐ ┌────▼─────┐ ┌────▼────────┐ ┌────▼──────────┐
+                           │   Fan-Out Orchestrator   │
+                           │  (ExecutorService Pool)  │──┬───────────────┬
+                           └───────┬────────┬─────────┘  │               │
+                                   │        │            │               │
+                                   │        │            │               │
+                    ┌──────────────▼─┐ ┌────▼─────┐ ┌────▼────────┐ ┌────▼───────────┐
                     │ REST API Sink  │ │ gRPC Sink│ │ MQ Sink     │ │ Wide-Column DB │
                     │ JSON Transform │ │ Protobuf │ │ XML         │ │ Map / CQL Map  │
-                    └────────────────┘ └──────────┘ └────────────┘ └───────────────┘
+                    └────────────────┘ └──────────┘ └─────────────┘ └────────────────┘
 
 
 Each sink has:
