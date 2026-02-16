@@ -39,12 +39,16 @@ The application will:
 The data flow in the system is as follows:
 
 File Reader (Streaming, BufferedReader)
+        
         ↓
 BlockingQueue<Record>  (Backpressure)
+        
         ↓
 Fan-Out Orchestrator (ExecutorService)
+   
    ↓        ↓        ↓        ↓
 REST Sink  gRPC Sink  MQ Sink  Wide-Column DB Sink
+   
    ↓        ↓        ↓        ↓
 JSON     Protobuf     XML      Map / CQL-style Data
 
